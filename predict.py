@@ -1,4 +1,4 @@
-# Predict script 
+# Predict script
 # author: Niwhskal
 
 import os
@@ -17,8 +17,8 @@ import torchvision.transforms.functional as F
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def main():
-    
-    parser = argparse.ArgumentParser() 
+
+    parser = argparse.ArgumentParser()
     parser.add_argument('--input_dir', help = 'Directory containing xxx_i_s and xxx_i_t with same prefix',
                         default = cfg.example_data_dir)
     parser.add_argument('--save_dir', help = 'Directory to save result', default = cfg.predict_result_dir)
@@ -33,9 +33,9 @@ def main():
 
     G = Generator(in_channels = 3).to(device)
     D1 = Discriminator(in_channels = 6).to(device)
-    D2 = Discriminator(in_channels = 6).to(device)  
-    vgg_features = Vgg19().to(device)   
-      
+    D2 = Discriminator(in_channels = 6).to(device)
+    vgg_features = Vgg19().to(device)
+
     G_solver = torch.optim.Adam(G.parameters(), lr=cfg.learning_rate, betas = (cfg.beta1, cfg.beta2))
     D1_solver = torch.optim.Adam(D1.parameters(), lr=cfg.learning_rate, betas = (cfg.beta1, cfg.beta2))
     D2_solver = torch.optim.Adam(D2.parameters(), lr=cfg.learning_rate, betas = (cfg.beta1, cfg.beta2))
@@ -74,11 +74,11 @@ def main():
           example_iter = iter(example_loader)
           inp = example_iter.next()
 
-        i_t = inp[0].to(device)
-        i_s = inp[1].to(device)
+        i_t = np.squeeze(inp[0]).to(device)
+        i_s = np.squeeze(inp[1]).to(device)
         name = str(inp[2][0])
 
-        o_sk, o_t, o_b, o_f = G(i_t, i_s, (i_t.shape[2], i_t.shape[3]))
+        o_sk, o_t, o_b, o_f = G(i_t, i_s, (i_t.shape[1], i_t.shape[2]))
 
         o_sk = o_sk.squeeze(0).detach().to('cpu')
         o_t = o_t.squeeze(0).detach().to('cpu')
@@ -92,7 +92,7 @@ def main():
         o_t = F.to_pil_image((o_t + 1)/2)
         o_b = F.to_pil_image((o_b + 1)/2)
         o_f = F.to_pil_image((o_f + 1)/2)
-                        
+
         o_f.save(os.path.join(args.save_dir, name + 'o_f.png'))
 
         #Uncomment the following if you need to save the rest of the predictions
@@ -101,7 +101,7 @@ def main():
         #o_t.save(os.path.join(savedir, name + 'o_t.png'))
         #o_b.save(os.path.join(savedir, name + 'o_b.png'))
 
-            
+
 if __name__ == '__main__':
     main()
     print_log('predicting finished.', content_color = PrintColor['yellow'])
