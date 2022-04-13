@@ -1,7 +1,7 @@
 Augmentor==0.2.8
 autograd==1.3
 cloudpickle==1.3.0
-cupy-cuda101==6.5.0
+cupy-cuda112
 fastprogress==0.2.3
 graphviz==0.10.1
 image==1.5.32
